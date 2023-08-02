@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<HTML>
+	<!-- 주석 -->
+	<HEAD>
+		<META charset="UTF-8">
+		<TITLE>채팅</TITLE>
+		<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+		<SCRIPT>
+			$( function() {
+				$("#inputTextBox").focus();
+				$("#inputTextBox").on("keyup",function(key){
+			        if(key.keyCode==13) {
+			        	var inputText = $("#inputTextBox").val();
+						if(inputText != "") {
+							$("#contetsbox").append("<div id='detailtext' class='detailtextstyle'>" + inputText + "<img id='deletebutton' class='xbutton' src='x.png'></div>");
+							$("#deletebutton").click( function() {
+								$("#detailtext").remove();
+							});
+							$("#inputTextBox").val("");
+							$("#inputTextBox").focus();
+						}    
+			        }
+			    });				
+			});
+
+		</SCRIPT>
+		<STYLE>
+			.xbutton {
+				width: 30px;
+				height: 30px;
+			}
+			.titleboxstyle {
+				width: 100%;
+				background-color: gray;
+			}
+			.contentsboxstyle {
+				width: 100%;
+				background-color: #E1E1E1;
+			}
+			.mainstyle {
+				width: 500px;
+			}
+			.detailtextstyle {
+				width: 90%;
+				margin-left: 5%;
+				margin-right: 5%;
+				margin-bottom: 10px;
+				background-color: white;
+			}
+			.inputboxstyle {
+				width: 90%;
+				margin-left: 5%;
+				font-size: 20px;
+			}
+		</STYLE>		
+	</HEAD>
+	<BODY>
+		<div id="mainframe" class="mainstyle">
+			<div id="titlebox" class="titleboxstyle">기사 등록하기</div>
+			<div id="contetsbox" class="contentsboxstyle"></div>
+			<div id="inputbox">
+				<input type="text" id="inputTextBox" class="inputboxstyle">
+			</div>
+		</div>
+		
+	</BODY>
+</HTML>

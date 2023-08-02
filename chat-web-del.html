@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<HTML>
+	<!-- 주석 -->
+	<HEAD>
+		<META charset="UTF-8">
+		<TITLE>하이하이</TITLE>
+		<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+		<SCRIPT>
+			var lastID;
+			$( function() {
+				// 처음 실행 될 때 DB에서 값 가져오기
+				lastID = 0;
+				$.readMessage();
+
+				url = "ws://192.168.22.10:9000";
+        		w = new WebSocket(url);
+
+        		w.onopen = function() {
+		            console.log("open");
+		        }     
+		        w.onmessage = function(e) {
+		            console.log(e.data); 
+		            if(e.data == "add") {
+		            	$.readMessage();	
+		            } else {
+		            	$("#detailtext" + e.data).remove();
+		            }
+		            
+		        }
+				//////////////////////////
+				$("#inputTextBox").focus();
+				$("#inputTextBox").on("keyup",function(key){
+			        if(key.keyCode==13) {
+			        	var inputText = $("#inputTextBox").val();
+						if(inputText != "") {
+							fetch("insert.jsp?inputtext=" + inputText)
+								.then((response) => {									
+									w.send("add");
+								});		
+						}    
+			        }
+			    });				
+			});
+			$.readMessage = function() {
+				// $("#contetsbox").empty();
+				fetch("read.jsp?lastid=" + lastID)
+					.then((response) => response.json())
+					.then((json) =>{
+						console.log(json);
+						for (var i = 0; i < json.length; i++) {
+							var textcounter = json[i].id;
+							var inputText = json[i].text;
+							lastID = textcounter;
+							$("#contetsbox").append("<div id='detailtext" + textcounter + "' class='detailtextstyle'>" + inputText + "<img id='deletebutton" + textcounter + "' value='" + textcounter + "' class='xbutton' src='x.png'></div>");
+							$("#deletebutton" + textcounter).click( function() {
+								var currentCount = $(this).attr("value");
+								console.log(currentCount);
+								fetch("delete.jsp?num=" + currentCount)
+									.then((response) => {
+										// console.log(response);
+										w.send(currentCount);
+									});																
+							});
+							$("#inputTextBox").val("");
+							$("#inputTextBox").focus();
+							$(document).scrollTop($(document).height());
+						}						
+					})					
+			}
+
+		</SCRIPT>
+		<STYLE>
+			.xbutton {
+				width: 30px;
+				height: 30px;
+			}
+			.titleboxstyle {
+				width: 100%;
+				background-color: gray;
+			}
+			.contentsboxstyle {
+				width: 100%;
+				background-color: #E1E1E1;
+			}
+			.mainstyle {
+				width: 500px;
+			}
+			.detailtextstyle {
+				width: 90%;
+				margin-left: 5%;
+				margin-right: 5%;
+				margin-bottom: 10px;
+				background-color: white;
+			}
+			.inputboxstyle {
+				width: 90%;
+				margin-left: 5%;
+				font-size: 20px;
+			}
+		</STYLE>		
+	</HEAD>
+	<BODY>
+		<div id="mainframe" class="mainstyle">
+			<div id="titlebox" class="titleboxstyle">KOPO 채팅</div>
+			<div id="contetsbox" class="contentsboxstyle"></div>
+			<div id="inputbox">
+				<input type="text" id="inputTextBox" class="inputboxstyle">
+			</div>
+		</div>
+		
+	</BODY>
+</HTML>

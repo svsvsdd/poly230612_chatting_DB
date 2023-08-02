@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+
+    <title>Document</title>
+    <script>
+        // $( function() {
+
+
+        // $.loginUserid = function() {
+        //             var userid = $("#userid").val();            
+        //             if (userid == ""){
+        //                 alert("아이디를 입력하세요");
+        //             } 
+        //         }
+
+        //     })
+
+    
+        $(function() {
+            $("#loginButton").on("click", function() {
+                var userid = $("#userid").val();
+                if (userid === "") {
+                alert("아이디를 입력하세요");
+                } else {
+                    console.log(userid);
+                // 로그인 처리
+                // ...
+                }
+            });
+        });
+
+
+
+
+
+
+
+
+
+    </script>
+</head>
+<body>
+    <div id="mainframe" class="mainstyle">
+        
+        <div id="titlebox" class="titleboxstyle">
+            <input type="text" id = "userid">
+            <input type="button" value = "로그인" id="loginButton">
+        <div id="contetsbox" class="contentsboxstyle"></div>
+        <div id="inputbox">
+            <input type="text" id="inputTextBox" class="inputboxstyle">
+        </div>
+    </div>
+</body>
+</html>

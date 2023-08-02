@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<HTML>
+	<!-- 주석 -->
+	<HEAD>
+		<META charset="UTF-8">
+		<TITLE>하이하이</TITLE>
+		<script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+		<SCRIPT>
+			var lastID;
+            var userid;
+			$( function() {
+				// 처음 실행 될 때 DB에서 값 가져오기
+				lastID = 0;
+                $("#userid").change(function(){                    
+				    userid = $("#userid").val();
+
+                    if (userid == " "){
+                        alert("아이디를 입력하세요");
+                    } else {
+                        console.log(userid);
+                        $("#idbox").hide();
+                        $.readMessage();
+                    }    				    
+                });
+
+				url = "ws://192.168.22.18:9000";    //서버로 하려면 ip를 적어야함.
+                w = new WebSocket(url);
+
+                w.onmessage = function(e) {
+                    console.log(e.data);
+                    if(e.data == "add") {
+                        $.readMessage();
+                    } else {
+		            	$("#detailtext" + e.data).remove();
+		            }
+                }
+
+                
+                $("#loginButton").on("click", function() {
+                    loginUser();
+                });
+                
+				$("#inputTextBox").focus();
+				$("#inputTextBox").on("keyup",function(key){
+			        if(key.keyCode==13) {
+			        	var inputText = $("#inputTextBox").val();
+						if(inputText != "") {
+							fetch("insert.jsp?inputtext=" + inputText + "&userid=" + userid)
+								.then((response) => {
+                                    w.send("add");  //서버에 보내면 온메시지에서 read
+								});		
+						}                                                
+			        }
+			    });
+            });
+
+
+
+			$.readMessage = function() {
+				// $("#contetsbox").empty();            
+                fetch("read.jsp?lastid=" + lastID)
+					.then((response) => response.json())
+					.then((json) =>{
+						console.log(json);
+						for (var i = 0; i < json.length; i++) {
+							var textcounter = json[i].id;
+							var inputText = json[i].text;
+                            var inputUserID = json[i].userid; // 사용자 아이디 가져오기
+							lastID = textcounter;
+
+                            if(inputUserID == userid) {
+								// 내 ID일 경우
+								$("#contetsbox").append("<div id='detailtext" + textcounter + "' class='mydetailtextstyle'>" + inputText + "<img id='deletebutton" + textcounter + "' value='" + textcounter + "' class='xbutton' src='x.png'></div>");
+								$("#deletebutton" + textcounter).click( function() {
+									var currentCount = $(this).attr("value");
+									console.log(currentCount);
+									fetch("delete.jsp?num=" + currentCount)
+										.then((response) => {
+											// console.log(response);
+											w.send(currentCount);
+										});																
+								});
+							} else {
+								// 내 ID가 아닐 경우
+								$("#contetsbox").append("<div id='detailtext" + textcounter + "' class='detailtextstyle'>" + inputText + "</div>");
+							}
+
+							$("#inputTextBox").val("");
+							$("#inputTextBox").focus();
+							$(document).scrollTop($(document).height());
+						}
+					})					
+			}
+
+		</SCRIPT>
+		<STYLE>
+			.xbutton {
+				width: 30px;
+				height: 30px;
+			}
+			.titleboxstyle {
+				width: 100%;
+				background-color: rgb(143, 150, 155);  
+			}
+			.contentsboxstyle {
+				width: 100%;
+				background-color: rgb(179, 198, 215);  
+			}
+			.mainstyle {
+				width: 500px;
+			}
+			.detailtextstyle {
+                border-radius: 10px;
+				width: 350px;
+				margin-left: 5%;
+				margin-right: 5%;
+				margin-bottom: 10px;
+				background-color: white;
+			}
+			.mydetailtextstyle {
+  border-radius: 10px;
+  display: inline-block;
+  text-align: right;
+  margin-left: auto;
+  margin-right: 5px;
+  margin-bottom: 10px;
+  background-color: rgb(247, 236, 92);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-width: 75%;
+}
+            
+			.inputboxstyle {
+				width: 90%;
+				margin-left: 5%;
+				font-size: 20px;
+			}
+			.idboxstyle {
+				width: 100%;
+				height: 100%;
+				background-color: gray;
+				z-index: 10;
+				position:fixed;
+				color: white;
+			}
+
+
+		</STYLE>		
+	</HEAD>
+	<BODY>
+        <div id="idbox" class="idboxstyle">
+			<br><br>
+			ID를 입력하세요 : <input type="text" id="userid">
+		</div>
+
+		<div id="mainframe" class="mainstyle">
+			<div id="titlebox" class="titleboxstyle">카톡</div>
+			<div id="contetsbox" class="contentsboxstyle"></div>
+			<div id="inputbox">
+				<input type="text" id="inputTextBox" class="inputboxstyle">
+			</div>
+		</div>
+		
+	</BODY>
+</HTML>
